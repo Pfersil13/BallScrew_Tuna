@@ -1,0 +1,68 @@
+{
+  "motors": {
+    "max_speed": 120.0,
+    "max_accel": 100.0,
+    "speed": 50.0,
+    "accel": 50.0,
+    "steps_per_mm": 200.0,
+    "microstepping": 16,
+    "torque": 1.5,
+    "invert_dir": false,
+    "hold_current": 300,
+    "position_offset": 0.0,
+    "limit_min_mm": 0.0,
+    "limit_max_mm": 100.0,
+    "current_ma": 900,
+    "Transfer_function": [100,100,10],
+    "driver_type": "TMC2209",
+    "stall_detection": false
+  },
+  "homing": {
+    "max_distance_mm": 150.0,
+    "homing_speed": 20.0,
+    "homing_direction": [-1,-1,-1]
+  },
+  "sequence": {
+    "type": "sine_wave",
+    "duration_sec": 60.0,
+    "frecuency": 1,
+    "amplitude_scale": [1.0,0.5,0.8],
+    "phase_offset_deg": [10,50,100],
+    "loop": false,                    
+    "start_delay_sec": 2.0,          
+    "playback_mode": "continuous"    
+  },
+  "wifi": {
+    "ssid": "Kinetic",
+    "password": "Aaodnasjdnqwi"
+  },
+  "ota": {
+    "enabled": true,
+    "port": 8266,
+    "device_name": "Kinetic",
+    "repository": "https://github.com/JimSHED/ESP32-OTA-Pull-GitHub/releases/download/example/otadirectory.json"
+  },
+  "mqtt": {
+    "enabled": true,
+    "broker": "192.168.1.100",
+    "port": 1883,
+    "username": "user",
+    "password": "pass",
+    "client_id": "motion_controller_esp",
+    "base_topic": "motion/device1/",
+    "lwt": {
+      "topic": "motion/device1/status",
+      "message": "offline",
+      "qos": 1,
+      "retain": true
+    },
+    "status_topic": "motion/device1/status",
+    "command_topic": "motion/device1/cmd",
+    "config_topic": "motion/device1/config"
+  },
+  "system": {
+    "save_on_change": true,
+    "config_version": "1.0.0"
+  }
+  
+}
