@@ -1,7 +1,8 @@
 #include "Sequence.h"
 #include <LittleFS.h>
 
-
+bool first_time = 0;
+uint16_t counter = 0;
 void generateSineSequence(Sequence* currentSequence, const SineWave* waves, double frequency) {
 
     float period = 1.0f/frequency;
@@ -16,9 +17,9 @@ void generateSineSequence(Sequence* currentSequence, const SineWave* waves, doub
     for (int i = 0; i < currentSequence->frames; i++) {
         double t = (double)i / currentSequence->fps;
 
-    currentSequence->U[i] = OFFSET_U + waves[0].amplitude * sin(2 * PI * frequency* t + waves[0].phase);
-    currentSequence->V[i] = OFFSET_V + waves[1].amplitude * sin(2 * PI * frequency * t + waves[1].phase);
-    currentSequence->W[i] = OFFSET_W + waves[2].amplitude * sin(2 * PI * frequency * t + waves[2].phase);
+    currentSequence->U[i] = OFFSET_U + waves[0].amplitude * sin(2 * PI * frequency* t + waves[0].phase*PI/180.f);
+    currentSequence->V[i] = OFFSET_V + waves[1].amplitude * sin(2 * PI * frequency * t + waves[1].phase*PI/180.f);
+    currentSequence->W[i] = OFFSET_W + waves[2].amplitude * sin(2 * PI * frequency * t + waves[2].phase*PI/180.f);
 
     Serial.print(currentSequence->U[i]); Serial.print(", ");
     Serial.print(currentSequence->V[i]); Serial.print(", ");
@@ -56,17 +57,16 @@ void saveSequenceToJson(const Sequence& seq) {
 }
 
 void sendSequenceToGRBL(const Sequence& seq, HardwareSerial& grblSerial) {
-  Serial.println("🔁 Enviando secuencia a GRBL...");
-
-  for (int i = 1; i < seq.frames; i++) {
+  //Serial.println("🔁 Enviando secuencia a GRBL...");
+ 
     // Coordenadas actuales y anteriores
-    float x0 = seq.U[i - 1];
-    float y0 = seq.V[i - 1];
-    float z0 = seq.W[i - 1];
+    float x0 = seq.U[counter - 1];
+    float y0 = seq.V[counter - 1];
+    float z0 = seq.W[counter - 1];
 
-    float x1 = seq.U[i];
-    float y1 = seq.V[i];
-    float z1 = seq.W[i];
+    float x1 = seq.U[counter];
+    float y1 = seq.V[counter];
+    float z1 = seq.W[counter];
 
     // Distancia entre puntos
     float dx = x1 - x0;
@@ -82,31 +82,24 @@ void sendSequenceToGRBL(const Sequence& seq, HardwareSerial& grblSerial) {
 
     // Feedrate en mm/min
     float feedrate = speed * 60.0f;
-
+    
     // Generar y enviar comando
     char gcode[64];
+    if(first_time == 0){
+      feedrate = 100;
+      first_time = 1;
+    }
+
     snprintf(gcode, sizeof(gcode), "G1 X%.3f Y%.3f Z%.3f F%.1f", x1, y1, z1, feedrate);
-    sendGcodeWithAck(grblSerial, gcode);
-
-    Serial.println(gcode);  // Debug
-  }
-
-  Serial.println("✅ Secuencia enviada.");
-}
-
-
-void sendGcodeWithAck(HardwareSerial& grblSerial, const char* gcode) {
-  grblSerial.println(gcode);
-  Serial.println("Sent: " + String(gcode));
-
-  unsigned long start = millis();
-  while (millis() - start < 1000) { // Espera hasta 1 segundo
-    if (grblSerial.available()) {
-      String response = grblSerial.readStringUntil('\n');
-      Serial.println("GRBL: " + response);
-      if (response.startsWith("ok") || response.startsWith("error")) {
-        break; // respuesta recibida, pasamos al siguiente comando
+    bool sended = sendGcodeWithAck(grblSerial, gcode);
+    if(sended){
+      counter++;
+      Serial.println(gcode);  // Debug
+      if(counter >= seq.frames){
+        Serial.println("✅ Secuencia enviada.");
+        counter = 0;
       }
     }
-  }
 }
+
+

@@ -4,6 +4,8 @@
     #include <Arduino.h>
 
     #include "ArduinoJson.h"
+    #include "GRBL.h"
+    
     #define MAX_FRAMES 1000  // Ajustable según memoria
 
     struct Sequence {
@@ -27,13 +29,18 @@
     #define FREQ 1.0           // frecuencia en Hz
     #define PERIOD 1.f/FREQ
 
-    #define OFFSET_U 90
-    #define OFFSET_V 90
-    #define OFFSET_W 90
+    #define OFFSET_U 0
+    #define OFFSET_V -3
+    #define OFFSET_W 0
+
+    #define MAX_RANGE_U 50 //º
+    #define MAX_RANGE_V 55 //nn
+    #define MAX_RANGE_W 17 //º
+
     void generateSineSequence(Sequence* currentSequence, const SineWave* waves, double frequency);
     void saveSequenceToJson(const Sequence& seq);
 
-    void sendGcodeWithAck(HardwareSerial& grblSerial, const char* gcode);
+    void sendSequenceToGRBL(const Sequence& seq, HardwareSerial& grblSerial);
 
 
 #endif
