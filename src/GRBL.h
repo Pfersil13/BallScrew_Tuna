@@ -25,14 +25,14 @@
 
     #define GRBL_MICROSTEPPING    16
 
-    #define GRBL_MIN_POS_U        -MAX_RANGE_U/2
-    #define GRBL_MAX_POS_U        +MAX_RANGE_U/2
+    #define GRBL_MIN_POS_U        -MAX_RANGE_U/2.f
+    #define GRBL_MAX_POS_U        +MAX_RANGE_U/2.f
 
-    #define GRBL_MIN_POS_V        -MAX_RANGE_V/2
-    #define GRBL_MAX_POS_V        +MAX_RANGE_V/2
+    #define GRBL_MIN_POS_V        -MAX_RANGE_V/2.f
+    #define GRBL_MAX_POS_V        +MAX_RANGE_V/2.f
 
-    #define GRBL_MIN_POS_W        -MAX_RANGE_W/2
-    #define GRBL_MAX_POS_W        +MAX_RANGE_W/2
+    #define GRBL_MIN_POS_W        -MAX_RANGE_W/2.f
+    #define GRBL_MAX_POS_W        +MAX_RANGE_W/2.f
 
     
 
