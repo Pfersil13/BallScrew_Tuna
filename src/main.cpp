@@ -33,6 +33,9 @@ void setup(){
       return;
     }
 
+  // Cargar al iniciar 
+  savePreferences();
+  //loadPreferences();
 
   /*if (!readSequencesFromFile("/secuencias.json", &mySystem.machine.sequence)) {
       Serial.println("Failed to read sequences");
@@ -61,7 +64,10 @@ void setup(){
   GRBLSerial.println("$21=1"); //HARD LIMITS
   delay(100);
   Serial.println("G92 GOOO");
-  GRBLSerial.println("G92 X20 Y40 Z10");
+  char gcode[32];
+  snprintf(gcode, sizeof(gcode), "G92 X%.3f Y%.3f Z%.3f", GRBL_MIN_POS_U,GRBL_MIN_POS_V, GRBL_MIN_POS_W); //20 40 10
+  GRBLSerial.println(gcode);
+  //GRBLSerial.println("G92 X20 Y40 Z10");
   delay(100);
   Serial.println("G1 GOOO");
   GRBLSerial.println("G1 X0 Y0 Z0 F1000");
@@ -82,67 +88,6 @@ void loop() {
     GRBLSerial.write(c);
   }
 
-/*  // 2. GRBL → Serial y WebSerial
-  static String grblLine = "";
-  char gcode[64];
-while (GRBLSerial.available()) {
-    char c = GRBLSerial.read();
-    Serial.write(c);         // Monitor físico
-    WebSerial.write(c);      // Web terminal
-
-    if (c == '\n') {
-        grblLine.trim(); // Esto modifica grblLine en sitio en Arduino
-
-        if (grblLine.indexOf("ALARM_X_MAX") != -1) {
-            Serial.println("OKKK");
-            sendUnlockAndWaitForOk(GRBLSerial);
-            snprintf(gcode, sizeof(gcode), "G92 X%.3f \n", -GRBL_MAX_POS_U);
-            GRBLSerial.print(gcode);
-            GRBLSerial.println("G1 X0 F500");
-        }
-        else if (grblLine.indexOf("ALARM_X_MIN") != -1) {
-          Serial.println("OKKK");
-           sendUnlockAndWaitForOk(GRBLSerial);
-            snprintf(gcode, sizeof(gcode), "G92 X%.3f \n", -GRBL_MIN_POS_U);
-            GRBLSerial.print(gcode);
-            GRBLSerial.println("G1 X0 F500");
-        }
-        else if (grblLine.indexOf("ALARM_Y_MAX") != -1) {
-            sendUnlockAndWaitForOk(GRBLSerial);
-            snprintf(gcode, sizeof(gcode), "G92 Y%.3f \n", 40.f);
-            Serial.println("GP2 40");
-            GRBLSerial.print(gcode);
-            GRBLSerial.println("G1 Y0 F1000");
-        }
-        else if (grblLine.indexOf("ALARM_Y_MIN") != -1) {
-            sendUnlockAndWaitForOk(GRBLSerial);
-            snprintf(gcode, sizeof(gcode), "G92 Y%.3f \n", -40.f);
-            Serial.println("GP2 0");
-            //GRBLSerial.println("G92 Y0");
-            GRBLSerial.print(gcode);
-            GRBLSerial.println("G1 Y40 F1000");
-        }
-        else if (grblLine.indexOf("ALARM_Z_MAX") != -1) {
-            sendUnlockAndWaitForOk(GRBLSerial);
-            snprintf(gcode, sizeof(gcode), "G92 Z%.3f \n", -400);
-            GRBLSerial.print(gcode);
-            GRBLSerial.println("G1 Z0 F500");
-        }
-        else if (grblLine.indexOf("ALARM_Z_MIN") != -1) {
-          sendUnlockAndWaitForOk(GRBLSerial);
-          snprintf(gcode, sizeof(gcode), "G92 Z%.3f \n", -GRBL_MIN_POS_W);
-          GRBLSerial.print(gcode);
-          GRBLSerial.println("G1 Z0 F500");
-        }
-
-        // Reset para siguiente línea
-        grblLine = "";
-    }
-    else {
-        grblLine += c;
-    }
-}
-  */
 
 sendSequenceToGRBL(currentSequence, GRBLSerial);
 readGrbl(GRBLSerial);

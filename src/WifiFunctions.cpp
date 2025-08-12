@@ -1,8 +1,12 @@
 #include "WifiFunctions.h"
 #include "HTML.h"
 #include "secrets.h"
-
-
+#include "File.h"
+// Variables globales para los valores:
+extern unsigned long period ;
+extern float amplitude[];
+extern float offset[] ;
+extern float pahse[] ;
 
 extern Sequence currentSequence;
 
@@ -61,6 +65,66 @@ bool connectWifi(uint32_t timeout_ms) {
       server.on("/sequence.json", HTTP_GET, [](AsyncWebServerRequest *request){
         request->send(LittleFS, "/sequence.json", "application/json");
       });
+
+      server.on("/updateSequence", HTTP_POST, 
+    [](AsyncWebServerRequest *request){
+      // Cuando termina el POST, responder al cliente:
+      request->send(200, "application/json", "{\"status\":\"OK\"}");
+    },
+    NULL,
+    [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      // Esta función se llama con el cuerpo en partes (puede venir en varios trozos)
+      // Solo parsear cuando es la última parte (index + len == total)
+      if (index == 0) {
+        // Limpiar buffer, etc., si usas uno
+      }
+
+      // Usaremos una String temporal para acumular (o un buffer estático)
+      static String body;
+
+      body += String((char*)data).substring(0, len);
+
+      if (index + len == total) {
+        // Última parte recibida, parsear JSON
+        StaticJsonDocument<256> doc;
+        DeserializationError error = deserializeJson(doc, body);
+        if (error) {
+          Serial.println("Error parseando JSON: " + String(error.c_str()));
+          return;
+        }
+
+        period = doc["period"];
+        amplitude[0] = doc["amp1"];
+        amplitude[1] = doc["amp2"];
+        amplitude[2] = doc["amp3"];
+        offset[0] = doc["offset1"];
+        offset[1] = doc["offset2"];
+        offset[2] = doc["offset3"];
+
+        Serial.printf("Period: %lu\n", period);
+        Serial.printf("Amplitudes: %.2f %.2f %.2f\n", amplitude[0], amplitude[1], amplitude[2]);
+        Serial.printf("Offsets: %.2f %.2f %.2f\n", offset[0], offset[1], offset[2]);
+
+        // Limpiar body para próxima vez
+        body = "";
+      }
+    });
+
+    server.on("/load", HTTP_GET, [](AsyncWebServerRequest *request) {
+      loadPreferences(); // para asegurarnos de que lee lo último
+
+      String json = "{";
+      json += "\"period\":" + String(period) + ",";
+      json += "\"amp1\":" + String(amplitude[0]) + ",";
+      json += "\"amp2\":" + String(amplitude[1]) + ",";
+      json += "\"amp3\":" + String(amplitude[2]) + ",";
+      json += "\"offset1\":" + String(offset[0]) + ",";
+      json += "\"offset2\":" + String(offset[1]) + ",";
+      json += "\"offset3\":" + String(offset[2]);
+      json += "}";
+
+      request->send(200, "application/json", json);
+    });
 
       ElegantOTA.begin(&server);
       WebSerial.begin(&server);

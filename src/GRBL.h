@@ -25,6 +25,10 @@
 
     #define GRBL_MICROSTEPPING    16
 
+    #define MAX_RANGE_U 40 //º antes 50
+    #define MAX_RANGE_V 80 //nn 55
+    #define MAX_RANGE_W 20 //º 17
+
     #define GRBL_MIN_POS_U        -MAX_RANGE_U/2.f
     #define GRBL_MAX_POS_U        +MAX_RANGE_U/2.f
 
