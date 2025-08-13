@@ -16,12 +16,6 @@
     #include <LittleFS.h>
 
     bool connectWifi(uint32_t timeout_ms);
-
-    void initMQTT();
-    void callback(char* topic, byte* message, unsigned int length);
-    void reconnect();
-    void MQTTloop();
-    void Pub();
     void recvMsg(uint8_t *data, size_t len);
     void seqUpdate();
     

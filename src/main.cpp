@@ -13,6 +13,7 @@
 unsigned long startMillis;
 const unsigned long limiteMillis = 16UL * 3600UL * 1000UL; // 16 horas
 const unsigned long wifiTime =   15*60* 1000UL; // 5min 
+
 HardwareSerial GRBLSerial(1); // UART1
 
 
