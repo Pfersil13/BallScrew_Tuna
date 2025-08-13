@@ -16,7 +16,6 @@ const unsigned long wifiTime =   15*60* 1000UL; // 5min
 HardwareSerial GRBLSerial(1); // UART1
 
 
-
 SineWave wave[3];
 Sequence currentSequence;
 
@@ -28,21 +27,9 @@ void setup(){
   delay(5000);
   Serial.println("Setup started");
 
-  if (!LittleFS.begin()) {
-      Serial.println("Failed to mount LittleFS");
-      return;
-    }
-
   // Cargar al iniciar 
-  savePreferences();
-  //loadPreferences();
-
-  /*if (!readSequencesFromFile("/secuencias.json", &mySystem.machine.sequence)) {
-      Serial.println("Failed to read sequences");
-      return;
-    }
-  printSequences(&mySystem.machine.sequence);
-  */
+  //savePreferences();
+  loadPreferences();
 
   Serial.println("Setup ended");
   wave[0].amplitude = 20;
@@ -53,8 +40,8 @@ void setup(){
   wave[1].phase =0;
   wave[2].phase = 180;
 
-  generateSineSequence(&currentSequence,wave,1); //0.06
-  saveSequenceToJson(currentSequence);
+  generateSineSequence(&currentSequence,wave,0.06); //0.06
+
  delay(1000);
 
   sendGRBLConfig(GRBLSerial);
@@ -125,6 +112,9 @@ readGrbl(GRBLSerial);
         ElegantOTA.loop();
         WebSerial.loop();
       }
+
+
+      seqUpdate();
 
 }
  

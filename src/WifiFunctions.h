@@ -23,5 +23,7 @@
     void MQTTloop();
     void Pub();
     void recvMsg(uint8_t *data, size_t len);
+    void seqUpdate();
+    
 
 #endif

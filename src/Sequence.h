@@ -36,10 +36,11 @@
 
   
 
-    void generateSineSequence(Sequence* currentSequence, const SineWave* waves, double frequency);
-    void saveSequenceToJson(const Sequence& seq);
+    void generateSineSequence(Sequence* currentSequence,  SineWave* waves, double frequency);
+    void saveSequenceToJson( Sequence& seq);
 
-    void sendSequenceToGRBL(const Sequence& seq, HardwareSerial& grblSerial);
+    void sendSequenceToGRBL( Sequence& seq, HardwareSerial& grblSerial);
+    String ShowOnWeb( Sequence& seq);
 
 
 #endif

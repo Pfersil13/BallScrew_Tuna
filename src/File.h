@@ -20,9 +20,6 @@
         int sequenceLengths[NUM_SEQUENCES];  // Longitudes reales de cada secuencia
         */
 
-        bool fileCopy(const char * path_to_copy, const char * destination_path);
-        bool fileRead( const char * path);
-        void saveSequenceValues(const String& json);
         void loadPreferences();
         void savePreferences();
 

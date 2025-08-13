@@ -2,20 +2,25 @@
 #include "HTML.h"
 #include "secrets.h"
 #include "File.h"
+
 // Variables globales para los valores:
 extern unsigned long period ;
 extern float amplitude[];
 extern float offset[] ;
-extern float pahse[] ;
+extern float phase[] ;
 
+extern SineWave wave[];
 extern Sequence currentSequence;
-
+String object;
 unsigned long currentMillisOTA;
 unsigned long LastMillis;
 
 uint32_t wifi_up_time = 350000;
 bool boot = 0;
 bool conected = 0;
+
+bool needsUpdate = false;
+bool updatedOnce = true;
 AsyncWebServer server(80);
 
 static bool initialized = false;
@@ -58,12 +63,26 @@ bool connectWifi(uint32_t timeout_ms) {
         request->send_P(200, "text/html", PAGE_MAIN);
       });
 
-      server.on("/sequence", HTTP_GET, [](AsyncWebServerRequest *request){
+      /*server.on("/sequence", HTTP_GET, [](AsyncWebServerRequest *request){
         request->send_P(200, "text/html", index_html);
       });
+*/
+      /*server.on("/sequence.json", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send(LittleFS, "/sequence.json", "application/json");
+      });
+      */
 
       server.on("/sequence.json", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(LittleFS, "/sequence.json", "application/json");
+        if(updatedOnce == true){
+          String Output = ShowOnWeb(currentSequence);
+          Serial.println("Updated");
+          request->send(200, "application/json", Output);
+          //updatedOnce = false;
+      } else {
+        request->send(204); // No Content
+      }
+        //String Output = ShowOnWeb(currentSequence);
+        //request->send(200, "application/json", Output);
       });
 
       server.on("/updateSequence", HTTP_POST, 
@@ -86,29 +105,52 @@ bool connectWifi(uint32_t timeout_ms) {
 
       if (index + len == total) {
         // Última parte recibida, parsear JSON
-        StaticJsonDocument<256> doc;
+        JsonDocument doc;
         DeserializationError error = deserializeJson(doc, body);
         if (error) {
           Serial.println("Error parseando JSON: " + String(error.c_str()));
           return;
         }
 
-        period = doc["period"];
-        amplitude[0] = doc["amp1"];
-        amplitude[1] = doc["amp2"];
-        amplitude[2] = doc["amp3"];
-        offset[0] = doc["offset1"];
-        offset[1] = doc["offset2"];
-        offset[2] = doc["offset3"];
+      if (doc.containsKey("period")) period = doc["period"].as<float>();
 
-        Serial.printf("Period: %lu\n", period);
+      const char* ampKeys[] = {"amp1","amp2","amp3"};
+      const char* offsetKeys[] = {"offset1","offset2","offset3"};
+      const char* phaseKeys[] = {"fase1","fase2","fase3"}; // usa "fase*" si ese es tu JSON
+
+      for (int i = 0; i < 3; i++) {
+          if (doc.containsKey(ampKeys[i])) amplitude[i] = doc[ampKeys[i]].as<float>();
+          if (doc.containsKey(offsetKeys[i])) offset[i] = doc[offsetKeys[i]].as<float>();
+          if (doc.containsKey(phaseKeys[i])) phase[i] = doc[phaseKeys[i]].as<float>();
+      }
+
+
+
+        savePreferences();
+        needsUpdate = true;
+
+        Serial.printf("Period: %f\n", period);
         Serial.printf("Amplitudes: %.2f %.2f %.2f\n", amplitude[0], amplitude[1], amplitude[2]);
+        Serial.printf("Fases: %.2f %.2f %.2f\n", phase[0], phase[1], phase[2]);
         Serial.printf("Offsets: %.2f %.2f %.2f\n", offset[0], offset[1], offset[2]);
-
         // Limpiar body para próxima vez
         body = "";
+
       }
+      
     });
+
+    /*server.on("/getSequence", HTTP_GET, [](AsyncWebServerRequest *request){
+      Serial.println("Intentandio");
+      if(updatedOnce == true){
+        String Output = ShowOnWeb(currentSequence);
+        Serial.println("Updated");
+        request->send(200, "application/json", Output);
+        updatedOnce = false;
+      } else {
+        request->send(204); // No Content
+    }
+    });*/
 
     server.on("/load", HTTP_GET, [](AsyncWebServerRequest *request) {
       loadPreferences(); // para asegurarnos de que lee lo último
@@ -267,7 +309,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     //setSequenceSin(freq);
   }else if (String(topic) == CFG_SEQ_POINTS) {
     // Cargar JSON con posiciones personalizadas
-    DynamicJsonDocument doc(4096);
+    JsonDocument doc;
     DeserializationError error = deserializeJson(doc, msg);
     if (!error) {
       currentSequence.fps = doc["fps"];
@@ -339,3 +381,22 @@ void recvMsg(uint8_t *data, size_t len){
 }
 
 
+void seqUpdate(){
+  if (needsUpdate) {
+        for (int i = 0; i < 3; i++) {
+            wave[i].amplitude = amplitude[i];
+            wave[i].offset = offset[i];
+            wave[i].phase = phase[i];
+        }
+        float freq = 1.0f / period;
+        Serial.printf("Period: %lu\n", period);
+        Serial.printf("Amplitudes: %.2f %.2f %.2f\n", wave[0].amplitude,wave[1].amplitude,wave[2].amplitude);
+        Serial.printf("Fases: %.2f %.2f %.2f\n",wave[0].phase,wave[1].phase,wave[2].phase);
+        Serial.printf("Offsets: %.2f %.2f %.2f\n", wave[0].offset,wave[1].offset,wave[2].offset);
+
+        generateSineSequence(&currentSequence, wave, freq);
+        //object = ShowOnWeb(currentSequence);
+        needsUpdate = false;
+        updatedOnce = true;
+    }
+}

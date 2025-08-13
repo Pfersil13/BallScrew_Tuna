@@ -117,7 +117,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Control Escultura</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -256,8 +255,8 @@
 <div class="form-section">
   <form id="sequenceForm" onsubmit="submitSequenceForm(event)">
     <div class="field-group">
-      <label for="period" class="bodytext">Periodo (ms):</label>
-      <input type="number" id="period" name="period" min="1" value="1000" required />
+      <label for="period" class="bodytext">Periodo (s):</label>
+      <input type="number" id="period" name="period" min="1" value="1000" step="0.1" required />
     </div>
 
     <div class="field-group">
@@ -314,7 +313,7 @@
 <script>
     // Valores por defecto de fábrica
   const factoryDefaults = {
-    period: 1666,
+    period: 1.6,
     amp1: 20,
     amp2: 30,
     amp3: 9,
@@ -350,22 +349,12 @@
       fase3: Number(form.fase3.value),
     };
 
-    // Filtrar solo los valores que hayan cambiado respecto a factoryDefaults
-    const modifiedValues = {};
-    for (const key in currentValues) {
-      if (currentValues[key] !== factoryDefaults[key]) {
-        modifiedValues[key] = currentValues[key];
-      }
-    }
+    // Enviar todos los valores sin filtrar
+  const modifiedValues = { ...currentValues };
 
-    if (Object.keys(modifiedValues).length === 0) {
-      alert('No se ha modificado ningún valor respecto a fábrica.');
-      return;
-    }
-
-    // Mostrar mensaje de envío
-    const responseDiv = document.getElementById('responseMessage');
-    responseDiv.textContent = '⏳ Enviando datos...';
+  // Mostrar mensaje de envío
+  const responseDiv = document.getElementById('responseMessage');
+  responseDiv.textContent = '⏳ Enviando datos...';
 
     try {
       const response = await fetch('/updateSequence', {
@@ -397,7 +386,11 @@
     const responseDiv = document.getElementById('responseMessage');
     responseDiv.textContent = '';
   }
-  async function fetchData() {
+
+
+  let sequenceChart; // variable global para el gráfico
+
+async function fetchData() {
   try {
     const response = await fetch("/sequence.json");
     if (!response.ok) throw new Error("No se pudo cargar sequence.json");
@@ -408,30 +401,46 @@
     const v = data.positions.V.map(Number);
     const w = data.positions.W.map(Number);
 
-    const ctx = document.getElementById('sequenceChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [
-          { label: 'Cola (U)', data: u, borderColor: '#009CA3', fill: false },
-          { label: 'Cuerpo (V)', data: v, borderColor: '#3CA1D5', fill: false },
-          { label: 'Cabeza (W)', data: w, borderColor: '#FF5733', fill: false }
-        ]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          x: { display: true, title: { display: true, text: 'Frame' } },
-          y: { display: true, title: { display: true, text: 'Valor' } }
+    if (!sequenceChart) {
+      // Crear gráfico por primera vez
+      const ctx = document.getElementById('sequenceChart').getContext('2d');
+      sequenceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            { label: 'Cola (U)', data: u, borderColor: '#009CA3', fill: false },
+            { label: 'Cuerpo (V)', data: v, borderColor: '#3CA1D5', fill: false },
+            { label: 'Cabeza (W)', data: w, borderColor: '#FF5733', fill: false }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: { display: true, title: { display: true, text: 'Frame' } },
+            y: { display: true, title: { display: true, text: 'Valor' } }
+          }
         }
-      }
-    });
+      });
+    } else {
+      // Actualizar datos del gráfico existente
+      sequenceChart.data.labels = labels;
+      sequenceChart.data.datasets[0].data = u;
+      sequenceChart.data.datasets[1].data = v;
+      sequenceChart.data.datasets[2].data = w;
+      sequenceChart.update();
+    }
   } catch (err) {
     console.error("Error cargando datos del gráfico:", err);
   }
 }
+ 
+// Llamada inicial
 fetchData();
+
+// Actualización cada segundo
+setInterval(fetchData, 1000);
+
 
 
 </script>

@@ -3,7 +3,7 @@
 
 bool first_time = 0;
 uint16_t counter = 0;
-void generateSineSequence(Sequence* currentSequence, const SineWave* waves, double frequency) {
+void generateSineSequence(Sequence* currentSequence,  SineWave* waves, double frequency) {
 
     float period = 1.0f/frequency;
     
@@ -11,24 +11,27 @@ void generateSineSequence(Sequence* currentSequence, const SineWave* waves, doub
     currentSequence->fps = 60;
     currentSequence->frames = currentSequence->fps * period;  // 2 segundos, por ejemplo
     currentSequence->armature = "3AxisRig";
-
-
+    Serial.print("Frames");
+    Serial.println( currentSequence->frames);
+     // Asegurarse de reservar memoria dinámica
 
     for (int i = 0; i < currentSequence->frames; i++) {
         double t = (double)i / currentSequence->fps;
 
-    currentSequence->U[i] = OFFSET_U + waves[0].amplitude * sin(2 * PI * frequency* t + waves[0].phase*PI/180.f);
-    currentSequence->V[i] = OFFSET_V + waves[1].amplitude * sin(2 * PI * frequency * t + waves[1].phase*PI/180.f);
-    currentSequence->W[i] = OFFSET_W + waves[2].amplitude * sin(2 * PI * frequency * t + waves[2].phase*PI/180.f);
+    currentSequence->U[i] = waves[0].offset + waves[0].amplitude * sin(2 * PI * frequency* t + waves[0].phase*PI/180.f);
+    currentSequence->V[i] = waves[1].offset + waves[1].amplitude * sin(2 * PI * frequency * t + waves[1].phase*PI/180.f);
+    currentSequence->W[i] = waves[2].offset + waves[2].amplitude * sin(2 * PI * frequency * t + waves[2].phase*PI/180.f);
 
     Serial.print(currentSequence->U[i]); Serial.print(", ");
     Serial.print(currentSequence->V[i]); Serial.print(", ");
     Serial.println(currentSequence->W[i]);
+    yield();
   }
+  Serial.println("FIN");
 }
  
-void saveSequenceToJson(const Sequence& seq) {
-  StaticJsonDocument<4096> doc;  // Aumenta si frames > ~300
+void saveSequenceToJson( Sequence& seq) {
+  JsonDocument doc;  // Aumenta si frames > ~300
 
   doc["description"] = seq.description;
   doc["fps"] = seq.fps;
@@ -56,7 +59,7 @@ void saveSequenceToJson(const Sequence& seq) {
   Serial.println("Secuencia guardada en /sequence.json");
 }
 
-void sendSequenceToGRBL(const Sequence& seq, HardwareSerial& grblSerial) {
+void sendSequenceToGRBL( Sequence& seq, HardwareSerial& grblSerial) {
   //Serial.println("🔁 Enviando secuencia a GRBL...");
  
     // Coordenadas actuales y anteriores
@@ -102,4 +105,24 @@ void sendSequenceToGRBL(const Sequence& seq, HardwareSerial& grblSerial) {
     }
 }
 
+String ShowOnWeb( Sequence& seq){
+ JsonDocument doc;
 
+  doc["frames"] = seq.frames;
+  doc["fps"] = seq.fps;
+
+  JsonObject positions = doc.createNestedObject("positions");
+  JsonArray u = positions.createNestedArray("U");
+  JsonArray v = positions.createNestedArray("V");
+  JsonArray w = positions.createNestedArray("W");
+
+  for (int i = 0; i < seq.frames; i++) {
+    u.add(seq.U[i]);
+    v.add(seq.V[i]);
+    w.add(seq.W[i]);
+  }
+
+  String output;
+  serializeJson(doc, output);
+  return output;
+}
