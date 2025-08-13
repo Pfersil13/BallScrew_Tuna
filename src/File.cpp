@@ -9,7 +9,7 @@ Preferences prefs;
 
 
 // Valores por defecto
-unsigned long period = 16666; //ms -> 16.66s
+float period = 1.66; //ms -> 16.66s
 float amplitude[3] = {20, 30, 9};
 float offset[3] = {0, 4, 0};
 float phase[3] = {180,0,180};
@@ -48,3 +48,11 @@ void loadPreferences() {
 }
 
 
+void loadWave(SineWave* wave){
+  for (int i = 0; i < 3; i++) {
+    wave[i].frequency = 1.0f/period;
+    wave[i].amplitude = amplitude[i];
+    wave[i].offset = offset[i];
+    wave[i].phase = phase[i];
+        }
+  }

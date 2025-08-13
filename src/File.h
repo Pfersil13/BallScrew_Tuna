@@ -6,7 +6,7 @@
         #include "LittleFS.h"
         #include "ArduinoJson.h"
         #include "Definitions.h"
-
+        #include "Sequence.h"
        /* typedef struct  {
         int m1;
         int m2;
@@ -22,6 +22,7 @@
 
         void loadPreferences();
         void savePreferences();
+        void loadWave( SineWave* wave);
 
 
 #endif

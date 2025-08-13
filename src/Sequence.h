@@ -26,7 +26,7 @@
     };
 
     #define FPS 60 //fps
-    #define A 1.0              // amplitud
+    #define AMPLITUD 1.0              // amplitud
     #define FREQ 1.0           // frecuencia en Hz
     #define PERIOD 1.f/FREQ
 
@@ -36,7 +36,7 @@
 
   
 
-    void generateSineSequence(Sequence* currentSequence,  SineWave* waves, double frequency);
+    void generateSineSequence(Sequence* currentSequence,  SineWave* waves);
     void saveSequenceToJson( Sequence& seq);
 
     void sendSequenceToGRBL( Sequence& seq, HardwareSerial& grblSerial);

@@ -3,10 +3,14 @@
 
 bool first_time = 0;
 uint16_t counter = 0;
-void generateSineSequence(Sequence* currentSequence,  SineWave* waves, double frequency) {
+void generateSineSequence(Sequence* currentSequence,  SineWave* waves) {
 
+    float frequency = waves[0].frequency;
     float period = 1.0f/frequency;
-    
+    Serial.print("Freq: ");
+    Serial.print(frequency);
+    Serial.print("Period: ");
+    Serial.println(period);
     currentSequence->description = "3-Axis Sine Animation";
     currentSequence->fps = 60;
     currentSequence->frames = currentSequence->fps * period;  // 2 segundos, por ejemplo
@@ -126,3 +130,4 @@ String ShowOnWeb( Sequence& seq){
   serializeJson(doc, output);
   return output;
 }
+

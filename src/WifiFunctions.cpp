@@ -5,7 +5,7 @@
 
 #define RETY_INTERVAL_MS 1000
 // Variables globales para los valores:
-extern unsigned long period ;
+extern float period ;
 extern float amplitude[];
 extern float offset[] ;
 extern float phase[] ;
@@ -27,7 +27,7 @@ AsyncWebServer server(80);
 extern HardwareSerial GRBLSerial; // UART1
 
 
-bool connectWifi(uint32_t timeout_ms) {
+bool connectWifi() {
   static bool initialized = false;
   static bool connected = false;
   static unsigned long startAttemptTime = 0;
@@ -103,8 +103,8 @@ bool connectWifi(uint32_t timeout_ms) {
           return;
         }
 
-      if (doc.containsKey("period")) period = doc["period"].as<float>();
-
+      if (doc.containsKey("period")) period = doc["period"];
+        Serial.println("Viedno Periodo");
       const char* ampKeys[] = {"amp1","amp2","amp3"};
       const char* offsetKeys[] = {"offset1","offset2","offset3"};
       const char* phaseKeys[] = {"fase1","fase2","fase3"}; // usa "fase*" si ese es tu JSON
@@ -120,7 +120,7 @@ bool connectWifi(uint32_t timeout_ms) {
         savePreferences();
         needsUpdate = true;
 
-        Serial.printf("Period: %f\n", period);
+        Serial.printf("Period: %.2f\n", period);
         Serial.printf("Amplitudes: %.2f %.2f %.2f\n", amplitude[0], amplitude[1], amplitude[2]);
         Serial.printf("Fases: %.2f %.2f %.2f\n", phase[0], phase[1], phase[2]);
         Serial.printf("Offsets: %.2f %.2f %.2f\n", offset[0], offset[1], offset[2]);
@@ -196,20 +196,16 @@ void recvMsg(uint8_t *data, size_t len){
 
 void seqUpdate(){
   if (needsUpdate) {
-        for (int i = 0; i < 3; i++) {
-            wave[i].amplitude = amplitude[i];
-            wave[i].offset = offset[i];
-            wave[i].phase = phase[i];
-        }
-        float freq = 1.0f / period;
-        Serial.printf("Period: %lu\n", period);
+        loadWave(wave);
+        Serial.printf("Period: %.2f\n", period);
         Serial.printf("Amplitudes: %.2f %.2f %.2f\n", wave[0].amplitude,wave[1].amplitude,wave[2].amplitude);
         Serial.printf("Fases: %.2f %.2f %.2f\n",wave[0].phase,wave[1].phase,wave[2].phase);
         Serial.printf("Offsets: %.2f %.2f %.2f\n", wave[0].offset,wave[1].offset,wave[2].offset);
 
-        generateSineSequence(&currentSequence, wave, freq);
-        //object = ShowOnWeb(currentSequence);
+        generateSineSequence(&currentSequence, wave);
         needsUpdate = false;
         updatedOnce = true;
     }
 }
+
+

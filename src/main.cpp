@@ -31,17 +31,19 @@ void setup(){
   // Cargar al iniciar 
   //savePreferences();
   loadPreferences();
-
+  loadWave(wave);
   Serial.println("Setup ended");
-  wave[0].amplitude = 20;
-  wave[1].amplitude = 20;//30;
-  wave[2].amplitude = 9;
 
-  wave[0].phase = 180;
-  wave[1].phase =0;
-  wave[2].phase = 180;
 
-  generateSineSequence(&currentSequence,wave,0.06); //0.06
+  //wave[0].amplitude = 20;
+  //wave[1].amplitude = 20;//30;
+  //wave[2].amplitude = 9;
+
+  //wave[0].phase = 180;
+  //wave[1].phase =0;
+  //wave[2].phase = 180;
+
+  generateSineSequence(&currentSequence,wave); //0.06
 
  delay(1000);
 
@@ -83,7 +85,7 @@ readGrbl(GRBLSerial);
 
 
       if(millis() - startMillis <= wifiTime){ //Si menor 15min
-        if (!connectWifi(10000)) {
+        if (!connectWifi()) {
           wifiReady = false;
          // Serial.println("Intento");
           int status = WiFi.status();

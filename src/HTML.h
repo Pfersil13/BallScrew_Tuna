@@ -221,7 +221,7 @@
     border: 2px solid #3CA1D5;
   }
   .logo {
-  width: 240px;   /* ancho fijo */
+  width: 120px;   /* ancho fijo */
   height: auto;   /* mantiene proporción */
 }
 .layout {

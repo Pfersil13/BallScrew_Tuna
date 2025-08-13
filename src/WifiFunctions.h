@@ -15,9 +15,8 @@
     #include "Sequence.h"
     #include <LittleFS.h>
 
-    bool connectWifi(uint32_t timeout_ms);
+    bool connectWifi();
     void recvMsg(uint8_t *data, size_t len);
     void seqUpdate();
-    
 
 #endif
