@@ -11,7 +11,7 @@
     #define GRBL_RX 18  // RX del ESP32 <- TX del GRBL
 
     #define GRBL_STEPS_PER_DEG_U  444.0 //  Steps/º
-    #define GRBL_STEPS_PER_DEG_V  200//640.0 //  Steps/mm
+    #define GRBL_STEPS_PER_DEG_V  640.0//640.0 //  Steps/mm
     #define GRBL_STEPS_PER_DEG_W  444.0 //  Steps/º
 
     #define GRBL_MAX_VELOCITY_U   1000

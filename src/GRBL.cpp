@@ -156,7 +156,7 @@ void readGrbl(HardwareSerial &grbl) {
         snprintf(gcode, sizeof(gcode), "G92 X%.3f", GRBL_MAX_POS_U);
         grbl.println(gcode);
         grbl.println("G91");
-        grbl.println("G1 X-3 F500");
+        grbl.println("G1 X-3 F200");
         grbl.println("G90");;
       }
       else if (grblLine.indexOf("ALARM_X_MIN") != -1) {
@@ -165,7 +165,7 @@ void readGrbl(HardwareSerial &grbl) {
         snprintf(gcode, sizeof(gcode), "G92 X%.3f", GRBL_MIN_POS_U);
         grbl.println(gcode);
         grbl.println("G91");
-        grbl.println("G1 X3 F500");
+        grbl.println("G1 X3 F200");
         grbl.println("G90");
       }
       else if (grblLine.indexOf("ALARM_Y_MAX") != -1) {
@@ -174,7 +174,7 @@ void readGrbl(HardwareSerial &grbl) {
         Serial.println("GP2 40");
         grbl.println(gcode);
         grbl.println("G91");
-        grbl.println("G1 Y-3 F500");
+        grbl.println("G1 Y-3 F200");
         grbl.println("G90");
       }
       else if (grblLine.indexOf("ALARM_Y_MIN") != -1) {
@@ -183,7 +183,7 @@ void readGrbl(HardwareSerial &grbl) {
         Serial.println("GP2 0");
         grbl.println(gcode);
         grbl.println("G91");
-        grbl.println("G1 Y3 F500");
+        grbl.println("G1 Y3 F200");
         grbl.println("G90");
       }
       else if (grblLine.indexOf("ALARM_Z_MAX") != -1) {
@@ -191,7 +191,7 @@ void readGrbl(HardwareSerial &grbl) {
         snprintf(gcode, sizeof(gcode), "G92 Z%.3f", GRBL_MAX_POS_W);
         grbl.println(gcode);
         grbl.println("G91");
-        grbl.println("G1 Z-3 F500");
+        grbl.println("G1 Z3 F200");
         grbl.println("G90");
       }
       else if (grblLine.indexOf("ALARM_Z_MIN") != -1) {
@@ -199,7 +199,7 @@ void readGrbl(HardwareSerial &grbl) {
         snprintf(gcode, sizeof(gcode), "G92 Z%.3f", GRBL_MIN_POS_W);
         grbl.println(gcode);
         grbl.println("G91");
-        grbl.println("G1 Z3 F500");
+        grbl.println("G1 Z-3 F200");
         grbl.println("G90");
       }
 

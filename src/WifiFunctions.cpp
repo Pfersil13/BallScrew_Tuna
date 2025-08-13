@@ -3,7 +3,7 @@
 #include "secrets.h"
 #include "File.h"
 
-#define RETY_INTERVAL_MS 1000
+#define RETY_INTERVAL_MS 10000
 // Variables globales para los valores:
 extern float period ;
 extern float amplitude[];
@@ -102,8 +102,10 @@ bool connectWifi() {
           Serial.println("Error parseando JSON: " + String(error.c_str()));
           return;
         }
+        float indice;
+      if (doc.containsKey("period")) indice = doc["period"];
 
-      if (doc.containsKey("period")) period = doc["period"];
+      //period = 0.2666*indice;
         Serial.println("Viedno Periodo");
       const char* ampKeys[] = {"amp1","amp2","amp3"};
       const char* offsetKeys[] = {"offset1","offset2","offset3"};

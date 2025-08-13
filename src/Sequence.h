@@ -6,7 +6,7 @@
     #include "ArduinoJson.h"
     #include "GRBL.h"
     
-    #define MAX_FRAMES 1000  // Ajustable según memoria
+    #define MAX_FRAMES 10000  // Ajustable según memoria
 
     struct Sequence {
         String description;

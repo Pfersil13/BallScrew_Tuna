@@ -12,7 +12,7 @@ void generateSineSequence(Sequence* currentSequence,  SineWave* waves) {
     Serial.print("Period: ");
     Serial.println(period);
     currentSequence->description = "3-Axis Sine Animation";
-    currentSequence->fps = 60;
+    currentSequence->fps = 30;
     currentSequence->frames = currentSequence->fps * period;  // 2 segundos, por ejemplo
     currentSequence->armature = "3AxisRig";
     Serial.print("Frames");
@@ -96,7 +96,7 @@ void sendSequenceToGRBL( Sequence& seq, HardwareSerial& grblSerial) {
       feedrate = 100;
       first_time = 1;
     }
-
+   
     snprintf(gcode, sizeof(gcode), "G1 X%.3f Y%.3f Z%.3f F%.1f", x1, y1, z1, feedrate);
     bool sended = sendGcodeWithAck(grblSerial, gcode);
     if(sended){

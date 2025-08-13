@@ -256,7 +256,7 @@
   <form id="sequenceForm" onsubmit="submitSequenceForm(event)">
     <div class="field-group">
       <label for="period" class="bodytext">Periodo (s):</label>
-      <input type="number" id="period" name="period" min="1" value="1000" step="0.1" required />
+      <input type="number" id="period" name="period" min="1" max=60" value="7" step="0.1" required />
     </div>
 
     <div class="field-group">
@@ -313,7 +313,7 @@
 <script>
     // Valores por defecto de fábrica
   const factoryDefaults = {
-    period: 1.6,
+    period: 16,
     amp1: 20,
     amp2: 30,
     amp3: 9,

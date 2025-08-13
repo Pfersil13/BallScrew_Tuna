@@ -49,13 +49,13 @@ void setup(){
 
   sendGRBLConfig(GRBLSerial);
   delay(1000);
-  //doHomingAndWait(GRBLSerial);
+  doHomingAndWait(GRBLSerial);
   startMillis = millis();
   GRBLSerial.println("$21=1"); //HARD LIMITS
   delay(100);
   Serial.println("G92 GOOO");
   char gcode[32];
-  snprintf(gcode, sizeof(gcode), "G92 X%.3f Y%.3f Z%.3f", GRBL_MIN_POS_U,GRBL_MIN_POS_V, GRBL_MIN_POS_W); //20 40 10
+  snprintf(gcode, sizeof(gcode), "G92 X%.3f Y%.3f Z%.3f", -GRBL_MIN_POS_U,-GRBL_MIN_POS_V, -GRBL_MIN_POS_W); //20 40 10
   GRBLSerial.println(gcode);
   //GRBLSerial.println("G92 X20 Y40 Z10");
   delay(100);

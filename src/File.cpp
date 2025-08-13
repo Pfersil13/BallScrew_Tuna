@@ -9,7 +9,7 @@ Preferences prefs;
 
 
 // Valores por defecto
-float period = 1.66; //ms -> 16.66s
+float period = 16.6; //ms -> 16.66s
 float amplitude[3] = {20, 30, 9};
 float offset[3] = {0, 4, 0};
 float phase[3] = {180,0,180};
