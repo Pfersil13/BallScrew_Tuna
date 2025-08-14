@@ -1,5 +1,7 @@
 #include "Sequence.h"
 #include <LittleFS.h>
+extern  bool  SerialDebugSequence ;
+extern  bool SerialDebug;
 
 bool first_time = 0;
 uint16_t counter = 0;
@@ -14,11 +16,17 @@ void generateSineSequence(Sequence* currentSequence,  SineWave* waves) {
     currentSequence->description = "3-Axis Sine Animation";
     currentSequence->fps = 30;
     currentSequence->frames = currentSequence->fps * period;  // 2 segundos, por ejemplo
+
+    while(currentSequence->frames  > MAX_FRAMES- 10){
+      currentSequence->fps--;
+      currentSequence->frames = currentSequence->fps * period;
+    }
+
     currentSequence->armature = "3AxisRig";
     Serial.print("Frames");
-    Serial.println( currentSequence->frames);
-     // Asegurarse de reservar memoria dinámica
-
+    Serial.print( currentSequence->frames);
+    Serial.print("FPS");
+    Serial.println( currentSequence->fps);
     for (int i = 0; i < currentSequence->frames; i++) {
         double t = (double)i / currentSequence->fps;
 
@@ -101,7 +109,8 @@ void sendSequenceToGRBL( Sequence& seq, HardwareSerial& grblSerial) {
     bool sended = sendGcodeWithAck(grblSerial, gcode);
     if(sended){
       counter++;
-      Serial.println(gcode);  // Debug
+      if(SerialDebugSequence == true)
+        Serial.println(gcode);  // Debug
       if(counter >= seq.frames){
         Serial.println("✅ Secuencia enviada.");
         counter = 0;

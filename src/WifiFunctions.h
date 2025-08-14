@@ -3,7 +3,6 @@
 
     
     #include <Arduino.h>
-    #include "Definitions.h"
     #include <ESPmDNS.h>
     #include <WiFiClientSecure.h>
     #include <AsyncTCP.h>

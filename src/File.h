@@ -5,7 +5,6 @@
         #include <string.h>
         #include "LittleFS.h"
         #include "ArduinoJson.h"
-        #include "Definitions.h"
         #include "Sequence.h"
        /* typedef struct  {
         int m1;

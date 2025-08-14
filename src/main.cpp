@@ -8,12 +8,12 @@
 #include "WifiFunctions.h"
 #include "Sequence.h"
 #include "GRBL.h"
-#define SERIAL_DEBUG
+
 
 unsigned long startMillis;
 const unsigned long limiteMillis = 16UL * 3600UL * 1000UL; // 16 horas
-const unsigned long wifiTime =   15*60* 1000UL; // 5min 
-
+const unsigned long wifiTime =   15*60* 1000UL; // 15min 
+const unsigned long wifiTimeBlocked =   1*60* 1000UL; // 15min 
 HardwareSerial GRBLSerial(1); // UART1
 
 
@@ -45,7 +45,7 @@ void setup(){
 
   generateSineSequence(&currentSequence,wave); //0.06
 
- delay(1000);
+   delay(1000);
 
   sendGRBLConfig(GRBLSerial);
   delay(1000);
@@ -111,6 +111,10 @@ readGrbl(GRBLSerial);
 
       //Ejecuta todo lo relacionado con el wifi
       if(wifiReady){
+        //while(millis() - startMillis < wifiTimeBlocked ){
+        //  ElegantOTA.loop();
+        //  WebSerial.loop();
+        //}
         //MQTTloop();
         ElegantOTA.loop();
         WebSerial.loop();

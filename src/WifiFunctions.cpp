@@ -3,7 +3,10 @@
 #include "secrets.h"
 #include "File.h"
 
-#define RETY_INTERVAL_MS 10000
+ bool  SerialDebugSequence =  false;
+bool SerialDebug =  false;
+extern bool ackReceived;
+#define RETY_INTERVAL_MS 200
 // Variables globales para los valores:
 extern float period ;
 extern float amplitude[];
@@ -52,12 +55,12 @@ bool connectWifi() {
       wl_status_t status = WiFi.status();
 
     if (status == WL_CONNECTED) {
-      Serial.println("\n✅ Conectado a WiFi");
+      Serial.println("\nConectado a WiFi");
       Serial.print("IP: "); Serial.println(WiFi.localIP());
       Serial.print("Host: "); Serial.println(WiFi.getHostname());
 
       if (MDNS.begin(WiFi.getHostname())) {
-        Serial.println("📡 mDNS iniciado");
+        Serial.println("mDNS iniciado");
       }
 
       // Configurar servidor y OTA
@@ -105,8 +108,8 @@ bool connectWifi() {
         float indice;
       if (doc.containsKey("period")) indice = doc["period"];
 
-      //period = 0.2666*indice;
-        Serial.println("Viedno Periodo");
+      period = 125.0f/indice;
+      Serial.println("Viedno Periodo");
       const char* ampKeys[] = {"amp1","amp2","amp3"};
       const char* offsetKeys[] = {"offset1","offset2","offset3"};
       const char* phaseKeys[] = {"fase1","fase2","fase3"}; // usa "fase*" si ese es tu JSON
@@ -168,7 +171,29 @@ bool connectWifi() {
         for (size_t i = 0; i < len; i++) {
           command += (char)data[i];
         }
-        WebSerial.println("📡 Enviando a GRBL: " + command);
+         // Comandos especiales
+        if (command.equalsIgnoreCase("SerialDebugGRBLOn")) {
+            SerialDebugSequence = true;
+            WebSerial.println("Debug GRBL activado");
+            return;
+        }
+        if (command.equalsIgnoreCase("SerialDebugGRBLOff")) {
+            SerialDebugSequence = false;
+            WebSerial.println("Debug GRBL desactivado");
+            return;
+        }
+        if (command.equalsIgnoreCase("SerialDebugOn")) {
+            SerialDebug = true;
+            WebSerial.println("Debug global activado");
+            return;
+        }
+        if (command.equalsIgnoreCase("SerialDebugOff")) {
+            SerialDebug = false;
+            WebSerial.println("Debug global desactivado");
+            return;
+        }
+        
+        WebSerial.println("Enviando a GRBL: " + command);
         GRBLSerial.print(command);
         GRBLSerial.print("\n");
       });
@@ -203,8 +228,12 @@ void seqUpdate(){
         Serial.printf("Amplitudes: %.2f %.2f %.2f\n", wave[0].amplitude,wave[1].amplitude,wave[2].amplitude);
         Serial.printf("Fases: %.2f %.2f %.2f\n",wave[0].phase,wave[1].phase,wave[2].phase);
         Serial.printf("Offsets: %.2f %.2f %.2f\n", wave[0].offset,wave[1].offset,wave[2].offset);
-
+        GRBLSerial.println("!");
+        GRBLSerial.println("\x18");
         generateSineSequence(&currentSequence, wave);
+        
+        sendUnlockAndWaitForOk(GRBLSerial);
+        ackReceived = true;
         needsUpdate = false;
         updatedOnce = true;
     }

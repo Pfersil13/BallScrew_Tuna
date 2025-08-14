@@ -28,7 +28,7 @@ void savePreferences() {
   prefs.putFloat("pha1", phase[1]);
   prefs.putFloat("pha2", phase[2]);
   prefs.end();
-  Serial.println("💾 Valores guardados en Preferences");
+  Serial.println("Valores guardados en Preferences");
 }
 
 void loadPreferences() {
@@ -44,7 +44,7 @@ void loadPreferences() {
   phase[1]    = prefs.getFloat("pha1", 0);
   phase[2]    = prefs.getFloat("pha2", 0);
   prefs.end();
-  Serial.println("📂 Valores cargados desde Preferences");
+  Serial.println("Valores cargados desde Preferences");
 }
 
 

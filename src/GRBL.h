@@ -3,7 +3,8 @@
 
     #include <Arduino.h>
     #include "Sequence.h"
-#include "WebSerial.h"
+    #include "WebSerial.h"
+    
     // grbl_config.h
     #pragma once
 

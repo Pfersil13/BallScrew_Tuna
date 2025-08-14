@@ -1,5 +1,6 @@
 #include "GRBL.h"
-
+extern  bool  SerialDebugSequence ;
+extern  bool SerialDebug;
 
 void sendGRBLConfig(HardwareSerial &grbl) {
 
@@ -135,6 +136,7 @@ char gcode[32];
 void readGrbl(HardwareSerial &grbl) {
   while (grbl.available()) {
     char c = grbl.read();
+    if(SerialDebug == true)
     Serial.write(c);
     WebSerial.write(c);
 
@@ -171,7 +173,6 @@ void readGrbl(HardwareSerial &grbl) {
       else if (grblLine.indexOf("ALARM_Y_MAX") != -1) {
         sendUnlockAndWaitForOk(grbl);
         snprintf(gcode, sizeof(gcode), "G95 Y%.3f", GRBL_MAX_POS_V);
-        Serial.println("GP2 40");
         grbl.println(gcode);
         grbl.println("G91");
         grbl.println("G1 Y-3 F200");
@@ -180,7 +181,6 @@ void readGrbl(HardwareSerial &grbl) {
       else if (grblLine.indexOf("ALARM_Y_MIN") != -1) {
         sendUnlockAndWaitForOk(grbl);
         snprintf(gcode, sizeof(gcode), "G92 Y%.3f", GRBL_MIN_POS_V);
-        Serial.println("GP2 0");
         grbl.println(gcode);
         grbl.println("G91");
         grbl.println("G1 Y3 F200");
@@ -219,12 +219,13 @@ bool sendGcodeWithAck(HardwareSerial& grblSerial, const char* gcode) {
     return false;
   }
 
-  ackReceived = false;
-  errorReceived = false;
+    ackReceived = false;
+    errorReceived = false;
 
-  grblSerial.println(gcode);
-  Serial.println("Sent: " + String(gcode));
-  return true; // Se envió con éxito
+    grblSerial.println(gcode);
+    if(SerialDebugSequence == true)
+    Serial.println("Sent: " + String(gcode));
+    return true; // Se envió con éxito
 }
 
  

@@ -6,7 +6,7 @@
     #include "ArduinoJson.h"
     #include "GRBL.h"
     
-    #define MAX_FRAMES 10000  // Ajustable según memoria
+    #define MAX_FRAMES 1000  // Ajustable según memoria
 
     struct Sequence {
         String description;
@@ -24,16 +24,6 @@
         double phase; // en radianes
         double offset; // 
     };
-
-    #define FPS 60 //fps
-    #define AMPLITUD 1.0              // amplitud
-    #define FREQ 1.0           // frecuencia en Hz
-    #define PERIOD 1.f/FREQ
-
-    #define OFFSET_U 0
-    #define OFFSET_V -3
-    #define OFFSET_W 0
-
   
 
     void generateSineSequence(Sequence* currentSequence,  SineWave* waves);
